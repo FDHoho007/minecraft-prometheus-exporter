@@ -18,15 +18,21 @@ architecture.
 
 Targeting **Minecraft 26.2** (Java 25).
 
-| Platform | Type | Status |
-| --- | --- | --- |
-| Paper | Bukkit plugin | ✅ Available |
-| NeoForge | Mod | ✅ Available |
-| Fabric | Mod | ✅ Available |
-| Forge | Mod | ✅ Available |
+> **On Minecraft 1.21.x or older?** This project only supports Minecraft 26.x.
+> For earlier versions, use the per-version builds from
+> [cpburnz/minecraft-prometheus-exporter][upstream]. They export the same
+> metric names, so your dashboards and queries will still work.
 
-All four platforms build against Minecraft 26.2. See [DEVELOPMENT.md] for the
-per-loader toolchain details.
+| Platform | Type | Minecraft | Status |
+| --- | --- | --- | --- |
+| Paper | Bukkit plugin | 26.2 | ✅ Available |
+| NeoForge | Mod | 26.2 – 26.x | ✅ Available |
+| Fabric | Mod | 26.1 – 26.x | ✅ Available |
+| Forge | Mod | 26.2 – 26.x | ✅ Available |
+
+All four platforms build against Minecraft 26.2. The Fabric mod also runs on
+26.1: 26.x ships unobfuscated, so the same jar works on both. See
+[DEVELOPMENT.md] for the per-loader toolchain details.
 
 ## Installation
 
@@ -34,6 +40,10 @@ Download the jar for your platform from the [releases] page.
 
 - **Paper:** copy the `prometheus-exporter-paper-*.jar` into the server
   `plugins/` directory.
+- **Fabric:** copy the `prometheus-exporter-fabric-*.jar` into the server
+  `mods/` directory. Requires [Fabric API].
+- **Forge:** copy the `prometheus-exporter-forge-*.jar` into the server `mods/`
+  directory.
 - **NeoForge:** copy the `prometheus-exporter-neoforge-*.jar` into the server
   `mods/` directory.
 
@@ -74,6 +84,8 @@ wrapper.
 ```sh
 ./gradlew :core:test          # platform-agnostic unit tests
 ./gradlew :paper:build        # paper/build/libs/prometheus-exporter-paper-*.jar
+./gradlew :mod:fabric:build   # mod/fabric/build/libs/prometheus-exporter-fabric-*.jar
+./gradlew :mod:forge:build    # mod/forge/build/libs/prometheus-exporter-forge-*.jar
 ./gradlew :mod:neoforge:build # mod/neoforge/build/libs/prometheus-exporter-neoforge-*.jar
 ```
 
@@ -95,3 +107,4 @@ manual tagging and no effect on the other platforms.
 [dashboards.md]: dashboards.md
 [releases]: https://github.com/drewburr/minecraft-prometheus-exporter/releases
 [upstream]: https://github.com/cpburnz/minecraft-prometheus-exporter
+[Fabric API]: https://modrinth.com/mod/fabric-api
