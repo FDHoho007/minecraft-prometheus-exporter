@@ -10,6 +10,7 @@ import com.drewburr.mcprom.core.ServerStatsProvider;
 import com.drewburr.mcprom.core.dto.DimensionStats;
 import com.drewburr.mcprom.core.dto.EntityTypeCount;
 import com.drewburr.mcprom.core.dto.PlayerInfo;
+import com.drewburr.mcprom.core.dto.PlayerStat;
 
 import org.bukkit.Server;
 import org.bukkit.World;
@@ -39,6 +40,25 @@ public class BukkitStatsProvider implements ServerStatsProvider {
 			players.add(new PlayerInfo(player.getUniqueId().toString(), player.getName()));
 		}
 		return players;
+	}
+
+	@Override
+	public List<PlayerStat> getPlayerStats() {
+		List<PlayerStat> playerStats = new ArrayList<>();
+		for (Player player : this.server.getOnlinePlayers()) {
+			String playerId = player.getUniqueId().toString();
+			String playerName = player.getName();
+			
+			for (org.bukkit.Statistic stat : org.bukkit.Statistic.values()) {
+				if (stat.getType() == org.bukkit.Statistic.Type.UNTYPED) {
+					int val = player.getStatistic(stat);
+					String statCode = "minecraft:" + stat.name().toLowerCase();
+					String statName = stat.name();
+					playerStats.add(new PlayerStat(playerId, playerName, statCode, statName, val));
+				}
+			}
+		}
+		return playerStats;
 	}
 
 	@Override

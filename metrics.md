@@ -79,6 +79,18 @@ The players connected to the server.
 | name   | The player name. |
 
 
+### mc_player_stat_total {player_id, player_name, code, name}
+
+The general stats about players.
+
+| Label       | Meaning                            |
+|-------------|------------------------------------|
+| player_id   | The player UUID.                   |
+| player_name | The player name.                   |
+| code        | The stat code (e.g. `minecraft:mob_kills`). |
+| name        | The readable stat name.            |
+
+
 ### mc_server_tick_seconds
 
  A histogram of the server tick times (in seconds).

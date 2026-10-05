@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.drewburr.mcprom.core.dto.DimensionStats;
 import com.drewburr.mcprom.core.dto.PlayerInfo;
+import com.drewburr.mcprom.core.dto.PlayerStat;
 
 /**
  * The seam between the platform-agnostic {@link MinecraftCollector} and a
@@ -23,6 +24,13 @@ public interface ServerStatsProvider {
 	 * @return The online players.
 	 */
 	List<PlayerInfo> getOnlinePlayers();
+
+	/**
+	 * The stats for currently online players. Feeds {@code mc_player_stat_total}.
+	 *
+	 * @return The online players' stats.
+	 */
+	List<PlayerStat> getPlayerStats();
 
 	/**
 	 * A per-dimension snapshot (loaded chunk counts and, optionally, per-type

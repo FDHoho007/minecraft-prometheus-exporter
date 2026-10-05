@@ -29,6 +29,7 @@ public final class PaperServerConfig {
 		file.addDefault("collector.jvm", config.collector_jvm);
 		file.addDefault("collector.mc", config.collector_mc);
 		file.addDefault("collector.mc_entities", config.collector_mc_entities);
+		file.addDefault("collector.mc_player_stats", config.collector_mc_player_stats);
 		file.addDefault("web.listen_address", config.web_listen_address);
 		file.addDefault("web.listen_port", config.web_listen_port);
 		file.options().copyDefaults(true);
@@ -37,6 +38,7 @@ public final class PaperServerConfig {
 		config.collector_jvm = file.getBoolean("collector.jvm", config.collector_jvm);
 		config.collector_mc = file.getBoolean("collector.mc", config.collector_mc);
 		config.collector_mc_entities = file.getBoolean("collector.mc_entities", config.collector_mc_entities);
+		config.collector_mc_player_stats = file.getBoolean("collector.mc_player_stats", config.collector_mc_player_stats);
 		config.collector_mc_dimension_tick_errors = TickErrorPolicy.fromString(
 			file.getString("collector.mc_dimension_tick_errors"));
 		config.web_listen_address = file.getString("web.listen_address", config.web_listen_address);
@@ -45,6 +47,7 @@ public final class PaperServerConfig {
 		plugin.getLogger().info("collector.jvm: " + config.collector_jvm);
 		plugin.getLogger().info("collector.mc: " + config.collector_mc);
 		plugin.getLogger().info("collector.mc_entities: " + config.collector_mc_entities);
+		plugin.getLogger().info("collector.mc_player_stats: " + config.collector_mc_player_stats);
 		plugin.getLogger().info("web.listen_address: " + config.web_listen_address);
 		plugin.getLogger().info("web.listen_port: " + config.web_listen_port);
 

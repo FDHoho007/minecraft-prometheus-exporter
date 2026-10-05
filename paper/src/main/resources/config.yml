@@ -11,6 +11,9 @@ collector:
   # Enable collecting metrics about the entities in each world
   mc_entities: true
 
+  # Enable collecting metrics about player stats (playtime, blocks mined, etc.)
+  mc_player_stats: true
+
   # How to handle mismatched dimension tick events: ignore, log, or strict.
   # Unused on Paper (which approximates tick timing from TPS); kept for parity
   # with the mod loaders.

@@ -9,6 +9,7 @@ import com.drewburr.mcprom.core.ServerStatsProvider;
 import com.drewburr.mcprom.core.dto.DimensionStats;
 import com.drewburr.mcprom.core.dto.EntityTypeCount;
 import com.drewburr.mcprom.core.dto.PlayerInfo;
+import com.drewburr.mcprom.core.dto.PlayerStat;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.resources.ResourceKey;
@@ -19,6 +20,10 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.stats.Stats;
+import net.minecraft.stats.Stat;
+import net.minecraft.resources.Identifier;
+import net.minecraft.network.chat.Component;
 
 /**
  * Feeds server data into the core collector using {@code net.minecraft}
@@ -44,6 +49,26 @@ public class VanillaStatsProvider implements ServerStatsProvider {
 			players.add(new PlayerInfo(profile.id().toString(), profile.name()));
 		}
 		return players;
+	}
+
+	@Override
+	public List<PlayerStat> getPlayerStats() {
+		List<PlayerStat> playerStats = new ArrayList<>();
+		for (ServerPlayer player : this.server.getPlayerList().getPlayers()) {
+			GameProfile profile = player.getGameProfile();
+			String playerId = profile.id().toString();
+			String playerName = profile.name();
+			net.minecraft.stats.ServerStatsCounter stats = player.getStats();
+
+			for (Stat<Identifier> stat : Stats.CUSTOM) {
+				int val = stats.getValue(stat);
+				Identifier statId = stat.getValue();
+				String statCode = statId.toString();
+				String statName = Component.translatable(statId.toLanguageKey("stat")).getString();
+				playerStats.add(new PlayerStat(playerId, playerName, statCode, statName, val));
+			}
+		}
+		return playerStats;
 	}
 
 	@Override

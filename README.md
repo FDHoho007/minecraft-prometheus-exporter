@@ -63,6 +63,7 @@ Options:
 | `collector.jvm` | `true` | Export JVM process metrics. |
 | `collector.mc` | `true` | Export Minecraft server metrics. |
 | `collector.mc_entities` | `true` | Export per-dimension entity counts. |
+| `collector.mc_player_stats` | `true` | Export player statistics (blocks mined, playtime, etc.). |
 | `collector.mc_dimension_tick_errors` | `log` | Mismatched dimension tick handling: `ignore` / `log` / `strict` (mods only). |
 | `web.listen_address` | `0.0.0.0` | Address to bind the metrics HTTP server. |
 | `web.listen_port` | `19565` | Port to serve metrics on. |

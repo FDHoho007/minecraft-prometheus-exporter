@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import com.drewburr.mcprom.core.dto.DimensionStats;
 import com.drewburr.mcprom.core.dto.EntityTypeCount;
 import com.drewburr.mcprom.core.dto.PlayerInfo;
+import com.drewburr.mcprom.core.dto.PlayerStat;
 
 import io.prometheus.client.Collector;
 import io.prometheus.client.GaugeMetricFamily;
@@ -110,6 +111,7 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	private volatile MetricFamilySamples cached_player_list;
 	private volatile MetricFamilySamples cached_dim_chunks_loaded;
 	private volatile MetricFamilySamples cached_entities;
+	private volatile MetricFamilySamples cached_player_stats;
 
 	/**
 	 * Constructs the instance.
@@ -146,6 +148,9 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 		if (config.collector_mc_entities) {
 			this.cached_entities = newEntitiesTotalMetric();
 		}
+		if (config.collector_mc_player_stats) {
+			this.cached_player_stats = newPlayerStatsMetric();
+		}
 	}
 
 	/**
@@ -159,8 +164,11 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 			this.cached_entities = this.config.collector_mc_entities
 				? this.collectEntitiesTotal(dimensions)
 				: null;
+			this.cached_player_stats = this.config.collector_mc_player_stats
+				? this.collectPlayerStats()
+				: null;
 		} catch (Exception e) {
-			LOG.severe("Failed to update cached metrics: " + e.getMessage());
+			LOG.log(java.util.logging.Level.SEVERE, "Failed to update cached metrics", e);
 		}
 	}
 
@@ -176,6 +184,7 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 			MetricFamilySamples player_list = this.cached_player_list;
 			MetricFamilySamples dim_chunks_loaded = this.cached_dim_chunks_loaded;
 			MetricFamilySamples entities = this.cached_entities;
+			MetricFamilySamples player_stats = this.cached_player_stats;
 
 			List<MetricFamilySamples> server_ticks = this.server_tick_seconds.collect();
 			List<MetricFamilySamples> server_tick_rates = this.server_tick_rate.collect();
@@ -188,6 +197,9 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 			if (entities != null) {
 				metrics.add(entities);
 			}
+			if (player_stats != null) {
+				metrics.add(player_stats);
+			}
 			metrics.addAll(server_ticks);
 			metrics.addAll(server_tick_rates);
 			if (dim_chunks_loaded != null) {
@@ -196,7 +208,7 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 			metrics.addAll(dim_ticks);
 			return metrics;
 		} catch (Exception e) {
-			LOG.severe("Failed to collect metrics: " + e.getMessage());
+			LOG.log(java.util.logging.Level.SEVERE, "Failed to collect metrics", e);
 			return Collections.emptyList();
 		}
 	}
@@ -245,7 +257,24 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	private GaugeMetricFamily collectPlayerList() {
 		GaugeMetricFamily metric = newPlayerListMetric();
 		for (PlayerInfo player : this.stats.getOnlinePlayers()) {
-			metric.addMetric(List.of(player.id(), player.name()), 1);
+			String id = player.id() != null ? player.id() : "unknown";
+			String name = player.name() != null ? player.name() : "unknown";
+			metric.addMetric(List.of(id, name), 1);
+		}
+		return metric;
+	}
+
+	/**
+	 * Build the player-stats metric from the provider.
+	 */
+	private GaugeMetricFamily collectPlayerStats() {
+		GaugeMetricFamily metric = newPlayerStatsMetric();
+		for (PlayerStat stat : this.stats.getPlayerStats()) {
+			String id = stat.id() != null ? stat.id() : "unknown";
+			String name = stat.name() != null ? stat.name() : "unknown";
+			String code = stat.code() != null ? stat.code() : "unknown";
+			String statName = stat.statName() != null ? stat.statName() : "unknown";
+			metric.addMetric(List.of(id, name, code, statName), stat.value());
 		}
 		return metric;
 	}
@@ -257,16 +286,24 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	 */
 	@Override
 	public List<MetricFamilySamples> describe() {
-		ArrayList<MetricFamilySamples> descs = new ArrayList<>();
-		descs.add(newPlayerListMetric());
-		if (this.config.collector_mc_entities) {
-			descs.add(newEntitiesTotalMetric());
+		try {
+			ArrayList<MetricFamilySamples> descs = new ArrayList<>();
+			descs.add(newPlayerListMetric());
+			if (this.config.collector_mc_entities) {
+				descs.add(newEntitiesTotalMetric());
+			}
+			if (this.config.collector_mc_player_stats) {
+				descs.add(newPlayerStatsMetric());
+			}
+			descs.addAll(this.server_tick_seconds.describe());
+			descs.addAll(this.server_tick_rate.describe());
+			descs.add(newDimensionChunksLoadedMetric());
+			descs.addAll(this.dim_tick_seconds.describe());
+			return descs;
+		} catch (Exception e) {
+			LOG.log(java.util.logging.Level.SEVERE, "Failed to describe metrics", e);
+			return Collections.emptyList();
 		}
-		descs.addAll(this.server_tick_seconds.describe());
-		descs.addAll(this.server_tick_rate.describe());
-		descs.add(newDimensionChunksLoadedMetric());
-		descs.addAll(this.dim_tick_seconds.describe());
-		return descs;
 	}
 
 	private static GaugeMetricFamily newDimensionChunksLoadedMetric() {
@@ -290,6 +327,14 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 			"mc_player_list",
 			"The players connected to the server.",
 			List.of("id", "name")
+		);
+	}
+
+	private static GaugeMetricFamily newPlayerStatsMetric() {
+		return new GaugeMetricFamily(
+			"mc_player_stat_total",
+			"The general stats about players.",
+			List.of("player_id", "player_name", "code", "name")
 		);
 	}
 

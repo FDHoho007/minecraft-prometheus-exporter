@@ -47,6 +47,7 @@ public final class ModConfig {
 		config.collector_jvm = bool(props, "collector.jvm", config.collector_jvm);
 		config.collector_mc = bool(props, "collector.mc", config.collector_mc);
 		config.collector_mc_entities = bool(props, "collector.mc_entities", config.collector_mc_entities);
+		config.collector_mc_player_stats = bool(props, "collector.mc_player_stats", config.collector_mc_player_stats);
 		config.collector_mc_dimension_tick_errors = TickErrorPolicy.fromString(
 			props.getProperty("collector.mc_dimension_tick_errors"));
 		config.web_listen_address = props.getProperty("web.listen_address", config.web_listen_address);
@@ -63,6 +64,7 @@ public final class ModConfig {
 		props.setProperty("collector.jvm", Boolean.toString(config.collector_jvm));
 		props.setProperty("collector.mc", Boolean.toString(config.collector_mc));
 		props.setProperty("collector.mc_entities", Boolean.toString(config.collector_mc_entities));
+		props.setProperty("collector.mc_player_stats", Boolean.toString(config.collector_mc_player_stats));
 		props.setProperty("collector.mc_dimension_tick_errors",
 			config.collector_mc_dimension_tick_errors.name().toLowerCase());
 		props.setProperty("web.listen_address", config.web_listen_address);

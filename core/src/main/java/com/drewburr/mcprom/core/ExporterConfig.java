@@ -28,6 +28,9 @@ public class ExporterConfig {
 	/** Whether to collect per-dimension entity metrics. */
 	public boolean collector_mc_entities = true;
 
+	/** Whether to collect player stat metrics. */
+	public boolean collector_mc_player_stats = true;
+
 	/** How to handle mismatched dimension tick events. */
 	public TickErrorPolicy collector_mc_dimension_tick_errors = TickErrorPolicy.LOG;
 
